@@ -20,6 +20,8 @@ pip install pandas openpyxl faker seaborn docxtpl
 4- Access the output Excel file in the specified output directory.
 
 ## project_root/
+
+```sh
 │
 ├── download/                    # Directory where the dataset is downloaded
 ├── extracted_files/             # Directory where the dataset is extracted
@@ -29,6 +31,7 @@ pip install pandas openpyxl faker seaborn docxtpl
 │   ├── kaggle.json              # Kaggle API credentials
 │   └── admission_template.docx  # Template for admission letters
 └── main.py                      # Main script to run the project
+```
 
 ## Requirements:
 - Python 3.x
