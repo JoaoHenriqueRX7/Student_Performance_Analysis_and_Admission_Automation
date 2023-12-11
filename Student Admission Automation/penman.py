@@ -9,7 +9,7 @@ from docxtpl import DocxTemplate
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
-
+import time
 # Constants
 MINIMUM_MATH_SCORE = 80
 MINIMUM_READING_SCORE = 85
@@ -129,6 +129,7 @@ def generate_admission_excel_list(admitted_students, letter_paths, output_folder
     
 
 def main():
+    start_time = time.time()
     kaggle_credentials = read_kaggle_credentials()
     set_kaggle_credentials(kaggle_credentials)
 
@@ -154,6 +155,10 @@ def main():
     generate_admission_excel_list(admitted_students, letter_paths, admission_lists_folder)
     
     print(f"Student letters successfully created at path: \n {output_admitted_folder}\n")
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
 
 if __name__ == "__main__":
     main()

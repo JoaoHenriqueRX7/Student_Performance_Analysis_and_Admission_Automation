@@ -9,6 +9,9 @@ from docxtpl import DocxTemplate
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+from multiprocessing import Pool
+import time
+
 
 # Constants
 MINIMUM_MATH_SCORE = 80
@@ -134,6 +137,7 @@ def generate_admission_excel_list(admitted_students, letter_paths, output_folder
     
 
 def main():
+    start_time = time.time()
     kaggle_credentials = read_kaggle_credentials()
     set_kaggle_credentials(kaggle_credentials)
 
@@ -153,12 +157,14 @@ def main():
     student_data = load_student_data(extraction_path)
     processed_data = process_student_data(student_data)
     admitted_students = add_fake_names(processed_data)
+    
     letter_paths = generate_admission_letters(admitted_students, output_admitted_folder)
-    
-    
     generate_admission_excel_list(admitted_students, letter_paths, admission_lists_folder)
     
     print(f"Student letters successfully created at path: \n {output_admitted_folder}\n")
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
 if __name__ == "__main__":
     main()
