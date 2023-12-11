@@ -6,6 +6,9 @@ import pandas as pd
 from faker import Faker
 import datetime
 from docxtpl import DocxTemplate
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
 
 # Constants
 MINIMUM_MATH_SCORE = 80
@@ -51,6 +54,11 @@ def load_student_data(extraction_path):
 
 def process_student_data(df):
     try:
+        #Reducing memory usage
+        df['math score'] = df['math score'].astype('int16')
+        df['reading score'] = df['math score'].astype('int16')
+        df['math score'] = df['math score'].astype('int16')
+        
         print("... processing Student data\n")
         df['total score'] = df['math score'] + df['reading score'] + df['writing score']
         df = df[df['math score'] >= MINIMUM_MATH_SCORE]
@@ -66,18 +74,63 @@ def add_fake_names(df):
     df['name'] = [fake.name() for _ in range(len(df))]
     return df
 
-def generate_admission_letters(admited_students, output_admited_folder):
-    print("... generating letters to admited students\n")
+def generate_admission_letters(admitted_students, output_admitted_folder):
+    print("... generating letters to admitted students")
     date_now = datetime.datetime.now().strftime("%m/%d/%Y")
     doc = DocxTemplate(ADMISSION_TEMPLATE_PATH)
+    letter_paths = []
 
-    for _, row in admited_students.iterrows():
+    for _, row in admitted_students.iterrows():
         context = {"Student_Name": row['name'], "date": date_now}
+        output_file = os.path.join(output_admitted_folder, f"{row['name']}_WL.docx")
         doc.render(context)
-        output_file = os.path.join(output_admited_folder, f"{row['name']}_Welcome_Letter.docx")
         doc.save(output_file)
-    
-    return output_admited_folder
+        letter_paths.append(output_file)
+
+    return letter_paths
+
+
+def generate_admission_excel_list(admitted_students, letter_paths, output_folder):
+    try:
+        current_year = datetime.datetime.now().year
+        filename = f"admitted_students_{current_year}.xlsx"
+        output_path = os.path.join(output_folder, filename)
+
+        # Add the letter paths to the DataFrame
+        admitted_students['Welcome Letter'] = letter_paths
+
+        # Save DataFrame to Excel
+        admitted_students.to_excel(output_path, index=False)
+
+        # Load the workbook and select the active worksheet
+        workbook = openpyxl.load_workbook(output_path)
+        worksheet = workbook.active
+
+        # Apply styling and create hyperlinks
+        for row, letter_path in enumerate(letter_paths, start=2):  # Start from row 2 (skip header)
+            cell = worksheet.cell(row=row, column=len(admitted_students.columns))
+            cell.hyperlink = letter_path
+            cell.value = "Open Letter"
+            cell.style = 'Hyperlink'
+
+        # Set column widths based on content
+        for column in worksheet.columns:
+            max_length = 0
+            column = list(column)
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            worksheet.column_dimensions[column[0].column_letter].width = adjusted_width
+
+        # Save the workbook
+        workbook.save(output_path)
+        print(f"Admitted students successfully saved to:\n {output_path}\n")
+    except Exception as e:
+        print(f"An error occurred while saving to Excel: \n{e}")
     
 
 def main():
@@ -87,9 +140,10 @@ def main():
     project_folder = os.path.dirname(__file__)
     download_path = os.path.join(project_folder, 'download')
     extraction_path = os.path.join(project_folder, 'extracted_files')
-    output_admited_folder = os.path.join(project_folder, 'admited_students')
+    output_admitted_folder = os.path.join(project_folder, 'admitted_students')
+    admission_lists_folder = os.path.join(project_folder, 'admission_lists')
 
-    for path in [download_path, extraction_path, output_admited_folder]:
+    for path in [download_path, extraction_path, output_admitted_folder, admission_lists_folder]:
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -98,11 +152,13 @@ def main():
     
     student_data = load_student_data(extraction_path)
     processed_data = process_student_data(student_data)
-    admited_students = add_fake_names(processed_data)
-
-    generate_admission_letters(admited_students, output_admited_folder)
+    admitted_students = add_fake_names(processed_data)
+    letter_paths = generate_admission_letters(admitted_students, output_admitted_folder)
     
-    print(f"Student letters successfully created at path: \n {output_admited_folder}")
+    
+    generate_admission_excel_list(admitted_students, letter_paths, admission_lists_folder)
+    
+    print(f"Student letters successfully created at path: \n {output_admitted_folder}\n")
 
 if __name__ == "__main__":
     main()
