@@ -22,15 +22,24 @@ pip install pandas openpyxl faker seaborn docxtpl
 ## project_root/
 
 ```sh
+project_root/
 │
-├── download/                    # Directory where the dataset is downloaded
-├── extracted_files/             # Directory where the dataset is extracted
-├── admitted_students/           # Output directory for admission letters
-├── admission_lists/             # Output directory for the Excel dashboard
-├── project_assets/              # Directory for project assets like templates
-│   ├── kaggle.json              # Kaggle API credentials
-│   └── admission_template.docx  # Template for admission letters
-└── main.py                      # Main script to run the project
+├── data/                         # Directory for storing datasets and related files
+│   ├── downloaded_data/          # Store downloaded data files here
+│   └── processed_data/           # Store processed or transformed data here
+│
+├── notebooks/                    # Jupyter notebooks
+│   └── ETL.ipynb                 # Your main ETL Jupyter Notebook
+│
+├── scripts/                      # Additional Python scripts (if any)
+│
+├── logs/                         # Directory for log files
+│   └── etl_logs.txt              # Log file for ETL processes
+│
+├── requirements.txt              # Required Python libraries
+│
+└── README.md                     # Project README file
+
 ```
 
 ## Requirements:
