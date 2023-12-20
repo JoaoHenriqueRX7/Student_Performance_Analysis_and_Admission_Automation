@@ -19,28 +19,6 @@ pip install pandas openpyxl faker seaborn docxtpl
 3- Run the penman.py script to start the automated data processing and letter generation.
 4- Access the output Excel file in the specified output directory.
 
-## project_root/
-
-```sh
-project_root/
-│
-├── data/                         # Directory for storing datasets and related files
-│   ├── downloaded_data/          # Store downloaded data files here
-│   └── processed_data/           # Store processed or transformed data here
-│
-├── notebooks/                    # Jupyter notebooks
-│   └── ETL.ipynb                 # Your main ETL Jupyter Notebook
-│
-├── scripts/                      # Additional Python scripts (if any)
-│
-├── logs/                         # Directory for log files
-│   └── etl_logs.txt              # Log file for ETL processes
-│
-├── requirements.txt              # Required Python libraries
-│
-└── README.md                     # Project README file
-
-```
 
 ## Requirements:
 - Python 3.x
